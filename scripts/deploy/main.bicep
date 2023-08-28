@@ -601,7 +601,9 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = if (
         isZoneRedundant: false
       }
     ]
+    enableFreeTier: true
     databaseAccountOfferType: 'Standard'
+  
   }
 }
 
@@ -609,6 +611,9 @@ resource cosmosDatabase 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2023
   parent: cosmosAccount
   name: 'CopilotChat'
   properties: {
+    options:{
+      throughput: 1000
+    }
     resource: {
       id: 'CopilotChat'
     }
