@@ -193,7 +193,7 @@ az account set -s "$SUBSCRIPTION"
 : "${WEB_APP_SVC_SKU:="B1"}"
 : "${WEB_APP_REGION:="westus2"}"
 : "${AZURE_AD_INSTANCE:="https://login.microsoftonline.com"}"
-: "${MEMORY_STORE:="AzureCognitiveSearch"}"
+: "${MEMORY_STORE:="Qdrant"}"
 : "${NO_COSMOS_DB:=false}"
 : "${NO_SPEECH_SERVICES:=false}"
 
