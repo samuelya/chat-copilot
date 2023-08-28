@@ -45,7 +45,7 @@ public class DocumentMemoryOptions
     /// https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-6.0
     /// </summary>
     [Range(0, int.MaxValue)]
-    public int FileSizeLimit { get; set; } = 1000000;
+    public int FileSizeLimit { get; set; } = 10000000;
 
     /// <summary>
     /// Maximum number of files to be allowed for importing in a single request.
