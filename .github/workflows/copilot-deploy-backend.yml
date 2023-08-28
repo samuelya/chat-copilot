@@ -72,5 +72,6 @@ jobs:
       - name: "Deploy"
         uses: azure/webapps-deploy@v2
         with:
+          resource-group-name: ${{vars.CC_DEPLOYMENT_GROUP_NAME}}
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: "${{ github.workspace }}/${{inputs.ARTIFACT_NAME}}/webapi.zip"

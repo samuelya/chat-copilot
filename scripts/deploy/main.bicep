@@ -455,7 +455,7 @@ resource azureCognitiveSearch 'Microsoft.Search/searchServices@2022-09-01' = if 
   name: 'acs-${uniqueName}'
   location: location
   sku: {
-    name: 'basic'
+    name: 'free'
   }
   properties: {
     replicaCount: 1
