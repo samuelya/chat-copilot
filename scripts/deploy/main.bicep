@@ -265,7 +265,7 @@ resource appServiceWebConfig 'Microsoft.Web/sites/config@2022-09-01' = {
         value: memoryStore == 'Qdrant' ? qdrantHost : ''
       }
       {
-        name: 'MemoryStore:Qdrant:Host'
+        name: 'MemoryStore:Qdrant:Key'
         value: memoryStore == 'Qdrant' ? qdrantKey : ''
       }
       {
