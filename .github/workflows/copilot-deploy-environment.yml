@@ -18,6 +18,10 @@ on:
         required: true
       AZURE_OPENAI_ENDPOINT:
         required: true
+      QDRANT_HOST:
+        required: true
+      QDRANT_KEY:
+        required: true
 
 permissions:
   contents: read
@@ -33,6 +37,8 @@ jobs:
       AZURE_TENANT_ID: ${{secrets.AZURE_TENANT_ID}}
       AZURE_SUBSCRIPTION_ID: ${{secrets.AZURE_SUBSCRIPTION_ID}}
       AZURE_OPENAI_ENDPOINT: ${{secrets.AZURE_OPENAI_ENDPOINT}}
+      QDRANT_HOST: ${{secrets.QDRANT_HOST}}
+      QDRANT_KEY: ${{secrets.QDRANT_KEY}}
 
   deploy-backend:
     needs: [deploy-infra]

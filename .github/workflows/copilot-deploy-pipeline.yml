@@ -28,6 +28,8 @@ jobs:
       AZURE_TENANT_ID: ${{secrets.AZURE_TENANT_ID}}
       AZURE_SUBSCRIPTION_ID: ${{secrets.AZURE_SUBSCRIPTION_ID}}
       AZURE_OPENAI_ENDPOINT: ${{secrets.AZURE_OPENAI_ENDPOINT}}
+      QDRANT_KEY: ${{secrets.QDRANT_KEY}}
+      QDRANT_HOST: ${{secrets.QDRANT_HOST}}
 
   # stable:
   #   uses: ./.github/workflows/copilot-deploy-environment.yml
@@ -40,3 +42,5 @@ jobs:
   #     AZURE_TENANT_ID: ${{secrets.AZURE_TENANT_ID}}
   #     AZURE_SUBSCRIPTION_ID: ${{secrets.AZURE_SUBSCRIPTION_ID}}
   #     AZURE_OPENAI_ENDPOINT: ${{secrets.AZURE_OPENAI_ENDPOINT}}
+  #     QDRANT_KEY: ${{secrets.QDRANT_KEY}}
+  #     QDRANT_HOST: ${{secrets.QDRANT_HOST}}

@@ -15,6 +15,10 @@ on:
         required: true
       AZURE_OPENAI_ENDPOINT:
         required: true
+      QDRANT_HOST:
+        required: true
+      QDRANT_KEY:
+        required: true
     outputs:
       deployment-id:
         description: "The Id of the current deployment."
