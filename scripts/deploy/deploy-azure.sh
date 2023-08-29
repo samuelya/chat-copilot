@@ -98,6 +98,7 @@ while [[ $# -gt 0 ]]; do
         -ms|--memory-store)
         MEMORY_STORE=="$2"
         shift
+        shift
         ;;
         -sap|--sql-admin-password)
         SQL_ADMIN_PASSWORD="$2"
@@ -107,9 +108,11 @@ while [[ $# -gt 0 ]]; do
         -qh|--qdrant-host)
         QDRANT_HOST="$2"
         shift
+        shift
         ;;
         -qk|--qdrant-key)
         QDRANT_KEY="$2"
+        shift
         shift
         ;;
         -nc|--no-cosmos-db)
