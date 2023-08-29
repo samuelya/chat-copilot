@@ -28,6 +28,7 @@ usage() {
     echo "  -ns, --no-speech-services                  Don't deploy Speech Services to enable speech as chat input"
     echo "  -dd, --debug-deployment                    Switches on verbose template deployment output"
     echo "  -ndp, --no-deploy-package                  Skips deploying the Web API package when set."
+
 }
 
 # Parse arguments
@@ -103,6 +104,14 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
+        -qh|--qdrant-host)
+        QDRANT_HOST="$2"
+        shift
+        ;;
+        -qk|--qdrant-key)
+        QDRANT_KEY="$2"
+        shift
+        ;;
         -nc|--no-cosmos-db)
         NO_COSMOS_DB=true
         shift
@@ -119,6 +128,7 @@ while [[ $# -gt 0 ]]; do
         NO_DEPLOY_PACKAGE=true
         shift
         ;;
+    
         *)
         echo "Unknown option $1"
         usage
@@ -173,6 +183,21 @@ if [[ "${MEMORY_STORE,,}" = "postgres" ]] && [[ -z "$SQL_ADMIN_PASSWORD" ]]; the
     exit 1
 fi
 
+# If MEMORY_STORE is qdrant, then QDRANT_KEY is mandatory
+if [[ "${MEMORY_STORE,,}" = "Qdrant" ]] && [[ -z "$QDRANT_KEY" ]]; then
+    echo "When --memory-store is 'Qdrant', --qdrant-key must be set."
+    usage
+    exit 1
+fi
+
+# If MEMORY_STORE is qdrant, then QDRANT_HOST is mandatory
+if [[ "${MEMORY_STORE,,}" = "Qdrant" ]] && [[ -z "$QDRANT_HOST" ]]; then
+    echo "When --memory-store is 'Qdrant', --qdrant-host must be set."
+    usage
+    exit 1
+fi
+
+
 # If resource group is not set, then set it to rg-DEPLOYMENT_NAME
 if [ -z "$RESOURCE_GROUP" ]; then
     RESOURCE_GROUP="rg-${DEPLOYMENT_NAME}"
@@ -211,6 +236,8 @@ JSON_CONFIG=$(cat << EOF
     "webApiClientId": { "value": "$BACKEND_CLIENT_ID" },
     "deployNewAzureOpenAI": { "value": $([ "$NO_NEW_AZURE_OPENAI" = true ] && echo "false" || echo "true") },
     "memoryStore": { "value": "$MEMORY_STORE" },
+    "qdrantHost":{ "value": "$QDRANT_HOST" },
+    "qdrantKey":{ "value": "$QDRANT_KEY" },
     "sqlAdminPassword": { "value": "$SQL_ADMIN_PASSWORD" },
     "deployCosmosDB": { "value": $([ "$NO_COSMOS_DB" = true ] && echo "false" || echo "true") },
     "deploySpeechServices": { "value": $([ "$NO_SPEECH_SERVICES" = true ] && echo "false" || echo "true") }

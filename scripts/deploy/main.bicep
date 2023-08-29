@@ -88,6 +88,14 @@ var storageFileShareName = 'aciqdrantshare'
 @secure()
 param sqlAdminPassword string = newGuid()
 
+@description('qdrant external host url')
+param qdrantHost string = ''
+
+@description('qdrant external host key')
+@secure()
+param qdrantKey string = ''
+
+
 resource openAI 'Microsoft.CognitiveServices/accounts@2022-12-01' = if (deployNewAzureOpenAI) {
   name: 'ai-${uniqueName}'
   location: location
@@ -254,11 +262,15 @@ resource appServiceWebConfig 'Microsoft.Web/sites/config@2022-09-01' = {
       }
       {
         name: 'MemoryStore:Qdrant:Host'
-        value: memoryStore == 'Qdrant' ? 'https://${appServiceQdrant.properties.defaultHostName}' : ''
+        value: memoryStore == 'Qdrant' ? qdrantHost : ''
+      }
+      {
+        name: 'MemoryStore:Qdrant:Host'
+        value: memoryStore == 'Qdrant' ? qdrantKey : ''
       }
       {
         name: 'MemoryStore:Qdrant:Port'
-        value: '443'
+        value: '6333'
       }
       {
         name: 'MemoryStore:AzureCognitiveSearch:UseVectorSearch'
@@ -378,78 +390,78 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10
   }
 }
 
-resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = if (memoryStore == 'Qdrant') {
-  name: 'st${rgIdHash}' // Not using full unique name to avoid hitting 24 char limit
-  location: location
-  kind: 'StorageV2'
-  sku: {
-    name: 'Standard_LRS'
-  }
-  properties: {
-    supportsHttpsTrafficOnly: true
-    allowBlobPublicAccess: false
-  }
-  resource fileservices 'fileServices' = {
-    name: 'default'
-    resource share 'shares' = {
-      name: storageFileShareName
-    }
-  }
-}
+// resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = if (memoryStore == 'Qdrant') {
+//   name: 'st${rgIdHash}' // Not using full unique name to avoid hitting 24 char limit
+//   location: location
+//   kind: 'StorageV2'
+//   sku: {
+//     name: 'Standard_LRS'
+//   }
+//   properties: {
+//     supportsHttpsTrafficOnly: true
+//     allowBlobPublicAccess: false
+//   }
+//   resource fileservices 'fileServices' = {
+//     name: 'default'
+//     resource share 'shares' = {
+//       name: storageFileShareName
+//     }
+//   }
+// }
 
-resource appServicePlanQdrant 'Microsoft.Web/serverfarms@2022-03-01' = if (memoryStore == 'Qdrant') {
-  name: 'asp-${uniqueName}-qdrant'
-  location: location
-  kind: 'linux'
-  sku: {
-    name: 'P1v3'
-  }
-  properties: {
-    reserved: true
-  }
-}
+// resource appServicePlanQdrant 'Microsoft.Web/serverfarms@2022-03-01' = if (memoryStore == 'Qdrant') {
+//   name: 'asp-${uniqueName}-qdrant'
+//   location: location
+//   kind: 'linux'
+//   sku: {
+//     name: 'P1v3'
+//   }
+//   properties: {
+//     reserved: true
+//   }
+// }
 
-resource appServiceQdrant 'Microsoft.Web/sites@2022-09-01' = if (memoryStore == 'Qdrant') {
-  name: 'app-${uniqueName}-qdrant'
-  location: location
-  kind: 'app,linux,container'
-  properties: {
-    serverFarmId: appServicePlanQdrant.id
-    httpsOnly: true
-    reserved: true
-    clientCertMode: 'Required'
-    virtualNetworkSubnetId: virtualNetwork.properties.subnets[1].id
-    siteConfig: {
-      numberOfWorkers: 1
-      linuxFxVersion: 'DOCKER|qdrant/qdrant:latest'
-      alwaysOn: true
-      vnetRouteAllEnabled: true
-      ipSecurityRestrictions: [
-        {
-          vnetSubnetResourceId: virtualNetwork.properties.subnets[0].id
-          action: 'Allow'
-          priority: 300
-          name: 'Allow front vnet'
-        }
-        {
-          ipAddress: 'Any'
-          action: 'Deny'
-          priority: 2147483647
-          name: 'Deny all'
-        }
-      ]
-      azureStorageAccounts: {
-        aciqdrantshare: {
-          type: 'AzureFiles'
-          accountName: memoryStore == 'Qdrant' ? storage.name : 'notdeployed'
-          shareName: storageFileShareName
-          mountPath: '/qdrant/storage'
-          accessKey: memoryStore == 'Qdrant' ? storage.listKeys().keys[0].value : ''
-        }
-      }
-    }
-  }
-}
+// resource appServiceQdrant 'Microsoft.Web/sites@2022-09-01' = if (memoryStore == 'Qdrant') {
+//   name: 'app-${uniqueName}-qdrant'
+//   location: location
+//   kind: 'app,linux,container'
+//   properties: {
+//     serverFarmId: appServicePlanQdrant.id
+//     httpsOnly: true
+//     reserved: true
+//     clientCertMode: 'Required'
+//     virtualNetworkSubnetId: virtualNetwork.properties.subnets[1].id
+//     siteConfig: {
+//       numberOfWorkers: 1
+//       linuxFxVersion: 'DOCKER|qdrant/qdrant:latest'
+//       alwaysOn: true
+//       vnetRouteAllEnabled: true
+//       ipSecurityRestrictions: [
+//         {
+//           vnetSubnetResourceId: virtualNetwork.properties.subnets[0].id
+//           action: 'Allow'
+//           priority: 300
+//           name: 'Allow front vnet'
+//         }
+//         {
+//           ipAddress: 'Any'
+//           action: 'Deny'
+//           priority: 2147483647
+//           name: 'Deny all'
+//         }
+//       ]
+//       azureStorageAccounts: {
+//         aciqdrantshare: {
+//           type: 'AzureFiles'
+//           accountName: memoryStore == 'Qdrant' ? storage.name : 'notdeployed'
+//           shareName: storageFileShareName
+//           mountPath: '/qdrant/storage'
+//           accessKey: memoryStore == 'Qdrant' ? storage.listKeys().keys[0].value : ''
+//         }
+//       }
+//     }
+//   }
+// }
 
 resource azureCognitiveSearch 'Microsoft.Search/searchServices@2022-09-01' = if (memoryStore == 'AzureCognitiveSearch') {
   name: 'acs-${uniqueName}'
@@ -580,14 +592,14 @@ resource webSubnetConnection 'Microsoft.Web/sites/virtualNetworkConnections@2022
   }
 }
 
-resource qdrantSubnetConnection 'Microsoft.Web/sites/virtualNetworkConnections@2022-09-01' = if (memoryStore == 'Qdrant') {
-  parent: appServiceQdrant
-  name: 'qdrantSubnetConnection'
-  properties: {
-    vnetResourceId: virtualNetwork.properties.subnets[1].id
-    isSwift: true
-  }
-}
+// resource qdrantSubnetConnection 'Microsoft.Web/sites/virtualNetworkConnections@2022-09-01' = if (memoryStore == 'Qdrant') {
+//   parent: appServiceQdrant
+//   name: 'qdrantSubnetConnection'
+//   properties: {
+//     vnetResourceId: virtualNetwork.properties.subnets[1].id
+//     isSwift: true
+//   }
+// }
 
 resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = if (deployCosmosDB) {
   name: toLower('cosmos-${uniqueName}')
