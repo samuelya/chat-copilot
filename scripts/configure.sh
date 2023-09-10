@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Configure user secrets, appsettings.Development.json, and webapp/.env for Chat Copilot.
 
 set -e
@@ -179,7 +179,7 @@ if [ "$AUTH_TYPE" = "$ENV_AZURE_AD" ]; then
   echo "REACT_APP_AUTH_TYPE=AzureAd" >> $WEBAPP_ENV_FILEPATH
   # Trim any trailing slash from instance before generating authority
   INSTANCE=${INSTANCE%/}
-  echo "REACT_APP_AAD_AUTHORITY=https://$INSTANCE/$TENANT_ID" >> $WEBAPP_ENV_FILEPATH
+  echo "REACT_APP_AAD_AUTHORITY=$INSTANCE/$TENANT_ID" >> $WEBAPP_ENV_FILEPATH
   echo "REACT_APP_AAD_CLIENT_ID=$FRONTEND_CLIENT_ID" >> $WEBAPP_ENV_FILEPATH
   echo "REACT_APP_AAD_API_SCOPE=api://$BACKEND_CLIENT_ID/access_as_user" >> $WEBAPP_ENV_FILEPATH
 fi
